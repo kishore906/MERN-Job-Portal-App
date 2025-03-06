@@ -8,7 +8,9 @@ import CustomPagination from "./CustomPagination";
 
 function SearchJobs() {
   const [searchJob, setSearchJob] = useState("");
-  const [jobType, setJobType] = useState("Full-time");
+  const [jobType, setJobType] = useState("");
+  const [jobLocation, setJobLocation] = useState("");
+  const [salary, setSalary] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [searchPerform, setSearchPerform] = useState(false);
 
@@ -17,9 +19,17 @@ function SearchJobs() {
   const [searchParams] = useSearchParams();
   const searchKeyword = searchParams.get("search");
   const searchJobType = searchParams.get("jobType");
+  const searchJobLocation = searchParams.get("jobLocation");
+  const searchJobSalary = searchParams.get("salary");
   const page = Number(searchParams.get("page")) || 1;
 
-  const params = { searchKeyword, searchJobType, page };
+  const params = {
+    searchKeyword,
+    searchJobType,
+    searchJobLocation,
+    searchJobSalary,
+    page,
+  };
   const { data, error } = useGetJobsQuery(params);
 
   useEffect(() => {
@@ -38,7 +48,10 @@ function SearchJobs() {
 
     if (searchJob) {
       setSearchPerform(true);
-      navigate(`?search=${searchJob}&jobType=${jobType}`);
+      navigate(
+        `?search=${searchJob}&jobType=${jobType}&salary=${salary}&jobLocation=${jobLocation}`
+      );
+      setIsOpen(false);
     } else {
       navigate("/dashboard/searchJobs");
     }
@@ -87,6 +100,7 @@ function SearchJobs() {
             </ul>
           )}
         </div>
+
         <div className="col-12 col-md-6">
           <label htmlFor="jobType" className="form-label">
             <b>Job Type:</b>
@@ -99,10 +113,55 @@ function SearchJobs() {
             onChange={(e) => setJobType(e.target.value)}
             required
           >
+            <option value="">Select job type:</option>
             <option value="Full-time">Full-time</option>
             <option value="Part-time">Part-time</option>
             <option value="Contract">Contract</option>
             <option value="Internship">Internship</option>
+          </select>
+        </div>
+
+        <div className="col-12 col-md-6">
+          <label htmlFor="salary" className="form-label">
+            <b>Salary Range:</b>
+          </label>
+          <select
+            id="salary"
+            name="salary"
+            className="form-select"
+            value={salary}
+            onChange={(e) => setSalary(e.target.value)}
+            required
+          >
+            <option value="">Select salary range:</option>
+            <option value="$55k-$65k">$55k - $65k</option>
+            <option value="$65k-$75k">$65k - $75k</option>
+            <option value="$75k-$90k">$75k - $90k</option>
+            <option value="$75k-$95K">$75k - $95k</option>
+            <option value="$100k-$120K">$100k - $120k</option>
+            <option value="$120k-$150K">$120k - $150k</option>
+            <option value="$150k-$200K">$150k - $200k</option>
+          </select>
+        </div>
+
+        <div className="col-12 col-md-6">
+          <label htmlFor="jobLocation" className="form-label">
+            <b>Job Location:</b>
+          </label>
+          <select
+            id="jobLocation"
+            name="jobLocation"
+            className="form-select"
+            value={jobLocation}
+            onChange={(e) => setJobLocation(e.target.value)}
+            required
+          >
+            <option value="">Select city:</option>
+            <option value="Sydney">Sydney, Australia</option>
+            <option value="Melbourne">Melbourne, Australia</option>
+            <option value="Brisbane">Brisbane, Australia</option>
+            <option value="Adelaide">Adelaide, Australia</option>
+            <option value="Perth">Perth, Australia</option>
           </select>
         </div>
 
@@ -122,7 +181,7 @@ function SearchJobs() {
       )}
 
       {searchPerform && data?.searchJobsCount === 0 && (
-        <h5 className="text-center m-5">No Jobs Found For Your Search...</h5>
+        <h5 className="text-center m-5">No jobs found for your search...</h5>
       )}
 
       {data?.jobs?.length > 0 && (

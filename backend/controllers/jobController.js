@@ -130,17 +130,25 @@ const updateJobStatusForUser = async (req, res) => {
 
 // search for jobs by user => /api/searchJobs
 const searchJobs = async (req, res) => {
-  const { search, jobType, page } = req.query;
-  //console.log(search, jobType);
+  const { search, jobType, jobLocation, salary, page } = req.query;
+  //console.log(search, jobType, jobLocation, salary);
+
   const resPerPage = 6;
   const currentpage = page || 1;
   const skipJobs = resPerPage * (currentpage - 1);
 
   try {
     const jobQuery = Job.find({
-      jobListingName: { $regex: search, $options: "i" },
-      jobType: { $regex: jobType, $options: "i" },
+      jobListingName: { $regex: `${search}`, $options: "i" },
+      jobType: { $regex: `${jobType}`, $options: "i" },
+      salary: { $regex: `\\$([0-9]+)k-\\$([0-9]+)k`, $options: "i" },
+      jobLocation: {
+        $regex: `${jobLocation}`,
+        $options: "i",
+      },
     });
+
+    //console.log(jobQuery);
 
     const alljobs = await jobQuery.exec();
 

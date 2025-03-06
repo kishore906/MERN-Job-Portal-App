@@ -101,7 +101,6 @@ function App() {
             element={
               <ProtectedRoute admin={true}>
                 <AddJob />
-                <AddJob />
               </ProtectedRoute>
             }
           />

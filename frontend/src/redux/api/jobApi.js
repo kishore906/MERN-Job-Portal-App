@@ -11,6 +11,8 @@ export const jobApi = createApi({
         params: {
           search: params?.searchKeyword,
           jobType: params?.searchJobType,
+          jobLocation: params?.searchJobLocation,
+          salary: params?.searchJobSalary,
           page: params?.page,
         },
       }),

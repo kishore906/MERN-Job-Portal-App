@@ -103,7 +103,10 @@ function Register() {
         </button>
 
         <p className="text-center mt-4">
-          Already registered? <Link className="textColor">Login</Link>
+          Already registered?
+          <Link to="/login" className="textColor">
+            Login
+          </Link>
         </p>
       </form>
     </div>
