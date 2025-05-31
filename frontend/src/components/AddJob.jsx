@@ -1,13 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
+import Quill from "quill";
+import "quill/dist/quill.snow.css";
 import { useNavigate } from "react-router-dom";
 import { useAddNewJobMutation } from "../redux/api/jobApi";
 
 function AddJob() {
+  const quillRef = useRef(null); // Ref to store the Quill instance
+  const editorRef = useRef(null); // State to hold editor content
+
   const [newJob, setNewJob] = useState({
     jobType: "",
     jobListingName: "",
-    jobDescription: "",
     salary: "",
     jobLocation: "",
     companyName: "",
@@ -15,6 +19,7 @@ function AddJob() {
     companyPhone: "",
     companyDescription: "",
   });
+
   const [addNewJob, { isLoading, error, isSuccess, data }] =
     useAddNewJobMutation();
   const navigate = useNavigate();
@@ -37,8 +42,29 @@ function AddJob() {
 
   const handleAddNewJob = (e) => {
     e.preventDefault();
-    addNewJob(newJob);
+
+    const job = {
+      jobType: newJob.jobType,
+      jobListingName: newJob.jobListingName,
+      jobDescription: quillRef.current.root.innerHTML,
+      salary: newJob.salary,
+      jobLocation: newJob.jobLocation,
+      companyName: newJob.companyName,
+      companyEmail: newJob.companyEmail,
+      companyPhone: newJob.companyPhone,
+      companyDescription: newJob.companyDescription,
+    };
+
+    addNewJob(job);
   };
+
+  useEffect(() => {
+    // Initialize quill editor on component mounting
+    //console.log(quillRef.current, editorRef.current);
+    if (!quillRef.current && editorRef.current) {
+      quillRef.current = new Quill(editorRef.current, { theme: "snow" });
+    }
+  }, []);
 
   return (
     <form className="addJob_form" onSubmit={handleAddNewJob}>
@@ -57,6 +83,9 @@ function AddJob() {
             onChange={handleChange}
             required
           >
+            <option value="" disabled>
+              Select JobType:
+            </option>
             <option value="Full-time">Full-time</option>
             <option value="Part-time">Part-time</option>
             <option value="Contract">Contract</option>
@@ -83,17 +112,8 @@ function AddJob() {
           <label htmlFor="jobDescription" className="form-label mb-3">
             <b>Job Description:</b>
           </label>
-          <textarea
-            id="jobDescription"
-            name="jobDescription"
-            rows={6}
-            className="form-control"
-            value={newJob.jobDescription}
-            onChange={handleChange}
-            required
-          >
-            Add Job responsibilities, description, skill etc...
-          </textarea>
+
+          <div ref={editorRef} style={{ height: "auto" }}></div>
         </div>
 
         <div className="col-12 col-md-6">
@@ -108,11 +128,11 @@ function AddJob() {
             onChange={handleChange}
             required
           >
-            <option value="$55k - $65k">$55k - $65k</option>
-            <option value="$65k - $75k">$65k - $75k</option>
-            <option value="$75k - $90k">$75k - $90k</option>
-            <option value="$90k - $100k">$90k - $100k</option>
-            <option value="$100k - $120k">$100k - $120k</option>
+            <option value="$55k-$65k">$55k - $65k</option>
+            <option value="$65k-$75k">$65k - $75k</option>
+            <option value="$75k-$90k">$75k - $90k</option>
+            <option value="$90k-$100k">$90k - $100k</option>
+            <option value="$100k-$120k">$100k - $120k</option>
           </select>
         </div>
 
@@ -189,7 +209,7 @@ function AddJob() {
           <textarea
             id="companyDescription"
             name="companyDescription"
-            rows={6}
+            rows={10}
             className="form-control"
             value={newJob.companyDescription}
             onChange={handleChange}

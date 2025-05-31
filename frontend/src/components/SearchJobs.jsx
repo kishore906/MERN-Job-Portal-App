@@ -113,7 +113,9 @@ function SearchJobs() {
             onChange={(e) => setJobType(e.target.value)}
             required
           >
-            <option value="">Select job type:</option>
+            <option value="" disabled>
+              Select job type:
+            </option>
             <option value="Full-time">Full-time</option>
             <option value="Part-time">Part-time</option>
             <option value="Contract">Contract</option>

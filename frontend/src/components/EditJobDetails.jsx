@@ -1,13 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
+import Quill from "quill";
+import "quill/dist/quill.snow.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { useUpdateJobMutation, useGetJobByIdQuery } from "../redux/api/jobApi";
 
 function EditJobDetails() {
+  const quillRef = useRef(null); // Ref to store the Quill instance
+  const editorRef = useRef(null); // State to hold editor content
+
   const [job, setJob] = useState({
     jobType: "",
     jobListingName: "",
-    jobDescription: "",
     salary: "",
     jobLocation: "",
     companyName: "",
@@ -28,6 +32,9 @@ function EditJobDetails() {
   useEffect(() => {
     if (data) {
       setJob(data);
+      if (quillRef.current) {
+        quillRef.current.clipboard.dangerouslyPasteHTML(data.jobDescription);
+      }
     }
 
     if (error) {
@@ -46,6 +53,14 @@ function EditJobDetails() {
     }
   }, [updateErr, isSuccess, updateMsg, navigate]);
 
+  useEffect(() => {
+    // Initialize quill editor on component mounting
+    //console.log(quillRef.current, editorRef.current);
+    if (!quillRef.current && editorRef.current) {
+      quillRef.current = new Quill(editorRef.current, { theme: "snow" });
+    }
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setJob({ ...job, [name]: value });
@@ -53,7 +68,20 @@ function EditJobDetails() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    updateJob({ id, body: job });
+
+    const updatedJob = {
+      jobType: job.jobType,
+      jobListingName: job.jobListingName,
+      jobDescription: quillRef.current.root.innerHTML,
+      salary: job.salary,
+      jobLocation: job.jobLocation,
+      companyName: job.companyName,
+      companyEmail: job.companyEmail,
+      companyPhone: job.companyPhone,
+      companyDescription: job.companyDescription,
+    };
+
+    updateJob({ id, body: updatedJob });
   };
 
   return (
@@ -96,16 +124,8 @@ function EditJobDetails() {
           <label htmlFor="jobDescription" className="form-label mb-3">
             <b>Job Description:</b>
           </label>
-          <textarea
-            id="jobDescription"
-            name="jobDescription"
-            rows={6}
-            className="form-control"
-            value={job?.jobDescription}
-            onChange={handleChange}
-          >
-            Add Job responsibilities, description, skill etc...
-          </textarea>
+
+          <div ref={editorRef} style={{ height: "auto" }}></div>
         </div>
 
         <div className="col-12 col-md-4">
@@ -209,7 +229,7 @@ function EditJobDetails() {
           <textarea
             id="companyDescription"
             name="companyDescription"
-            rows={6}
+            rows={10}
             className="form-control"
             value={job?.companyDescription}
             onChange={handleChange}

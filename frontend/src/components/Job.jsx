@@ -12,8 +12,13 @@ function Job({ job }) {
       </div>
       <h6 className="fw-bold">{job.jobListingName}</h6>
 
-      <p className="mt-3">
-        {`${job.jobDescription.substring(0, 70)}...`}
+      <p
+        className="mt-3"
+        dangerouslySetInnerHTML={{
+          __html: `${job.jobDescription.substring(0, 70)}...`,
+        }}
+      >
+        {/*`${job.jobDescription.substring(0, 70)}...`*/}
         {/* <span className="text-primary ms-2 text-decoration-underline">
           more
         </span> */}
